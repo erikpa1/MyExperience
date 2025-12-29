@@ -12,7 +12,9 @@ https://github.com/erikpa1/MyExperience/wiki
 
 **Authors**: Erik Palenčík, Štefan Mozol, Patrik Grznár
 
-**Link**: Comming soon
+**DOI**: 10.53052/9788367652506.07
+
+**Link**: [https://www.researchgate.net/publication/398371721_Utilization_of_Indoor_RTLS_and_IoT_in_Manufacturing_and_Logistics_Companies](https://engineerxxi.ubb.edu.pl/fcp/eHFNIBD8dJBYXMwoXQH5hbEpmfHIGFBcNBi4oGgh0VWFeUxRUPBYvEkFWQQMOZm96Dzc1IikcFEpjZXQLC3QZ/_users/code_0DQNBBTkZMh4KLBYRAGomPA9qIDw/publikacje/2025/978836765250607.pdf)
 
 
 
