@@ -5,6 +5,11 @@ from fischertechnik.controller.Motor import Motor
 from lib.controller import *
 from lib.machine_learning import *
 
+import urllib.request
+import urllib.error
+import json
+
+
 BeltSpeed = None
 BeltSteps = None
 MovementSpeed = None
@@ -147,6 +152,8 @@ def ejectBlue():
 
 
 def ejectFAIL():
+    notifyUpdate()
+
     global BeltSpeed, BeltSteps, MovementSpeed, PositionBay1, PositionBay2, j, PositionBay3, i, state_code, PositionBay4, PositionCamera, dubblepart, num
     TXT_SLD_M_O3_compressor.on()
     logging.debug('FAIL')
@@ -200,3 +207,24 @@ def clean_exit():
     os._exit(os.EX_OK)
 
 
+def notifyUpdate():
+
+
+    url = "http://192.168.50.19:8080/api/fischertechnik"
+
+    try:
+        # Creating the request and opening the URL
+        with urllib.request.urlopen(url, timeout=10) as response:
+            # Check the HTTP Status Code (200 is Success)
+            status = response.getcode()
+            print(f"Status Code: ", status)
+
+            # Read the raw bytes and decode to a string
+            html_content = response.read().decode('utf-8')
+
+            print(html_content)
+
+    except urllib.error.HTTPError as e:
+        print(f"HTTP Error: {e.code}")
+    except urllib.error.URLError as e:
+        print(f"Server connection failed: {e.reason}")
