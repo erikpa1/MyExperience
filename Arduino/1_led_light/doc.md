@@ -1,4 +1,6 @@
+Tutorial:
 
+https://www.youtube.com/watch?v=9GLaU-BCEQM&list=PLlBVuTSjOrclb0iCMSRpS_H1lSrlSVeEm&index=3
 
 ### Inserting diode
 
