@@ -6,7 +6,7 @@ import os
 import datetime
 import queue
 
-from .twin_event import PartPassed
+from twin_event import PartPassed, PartFailed
 
 try:
     import paho.mqtt.client as mqtt
@@ -19,7 +19,7 @@ DEFAULT_CONFIG = {
     "broker_ip": "192.168.50.140",
     "port": 2883,
     "topic": "#",
-    "output_file": "mqtt_stream.log",
+    "output_file": "passed.log",
     "username": "ft",
     "password": "fischertechnik",
     "qos": 0,
@@ -408,7 +408,7 @@ class MQTTLoggerApp:
             "broker_ip": self.ip_var.get().strip(),
             "port": port,
             "topic": self.topic_var.get().strip() or "#",
-            "output_file": self.file_var.get().strip() or "mqtt_stream.log",
+            "output_file": self.file_var.get().strip() or "failed.log",
             "username": self.user_var.get(),
             "password": self.pass_var.get(),
             "qos": qos,
@@ -552,17 +552,37 @@ class MQTTLoggerApp:
 
         # --- LOGIC TO CATCH part_pass_fail ---
         try:
-            # Parse the MQTT payload as JSON
             data = json.loads(payload)
-
-            # Check if 'part_pass_fail' is in the top level or inside the 'payload' key
-            # based on your logs: {"payload": {"part_pass_fail": {...}}}
             inner_payload = data.get("payload", {})
-            if isinstance(inner_payload, dict) and "part_pass_fail" in inner_payload:
-                status_info = inner_payload["part_pass_fail"]
-                # Extract the text if it exists
-                text_val = status_info.get("text", "Unknown")
-                PartPassed(text_val)
+
+            if inner_payload:
+                # Colors that indicate a PASS result
+                PASS_COLORS = ["red", "white", "blue"]
+
+                def is_active(val):
+                    """Handle both boolean True and string 'true'"""
+                    if isinstance(val, bool):
+                        return val
+                    if isinstance(val, str):
+                        return val.lower() == "true"
+                    return False
+
+                # Check each pass color
+                detected_color = None
+                for color in PASS_COLORS:
+                    if color in inner_payload and is_active(inner_payload[color].get("active")):
+                        detected_color = color.upper()
+                        break
+
+                # Check fail state
+                fail_data = inner_payload.get("fail", {})
+                is_fail = is_active(fail_data.get("active")) or is_active(fail_data.get("on"))
+
+                if detected_color:
+                    PartPassed(detected_color)
+                elif is_fail:
+                    PartFailed()  # call whatever your fail handler is
+
         except Exception:
             # If it's not JSON or parsing fails, just ignore and continue logging
             pass
