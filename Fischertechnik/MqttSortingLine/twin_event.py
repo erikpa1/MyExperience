@@ -1,27 +1,20 @@
+import json
+import time
+
 import urllib.request
 import urllib.error
 import urllib.parse
-import json
 
-TWIN_URL = "http://localhost:8080/api/logschedule/neworder"
-
-RED_OUTPUT = "69b6e349b1c3a15583168566"
-BLUE_OUTPUT = "69b6e34fb1c3a155831686e9"
-WHITE_OUTPUT = "69b6e357b1c3a15583168869"
-FAILED_OUTPUT = "69b6e9afaecddb203c2c383f"
-
-RED_TARGET = "69b6ec0497e93d0906e0d15c"
-BLUE_TARGET = RED_TARGET
-WHITE_TARGET = RED_TARGET
+from config import *
 
 
 def PartPassed(partColor: str):
     if partColor == "RED":
-        SendMaterialRequest("RED", RED_OUTPUT, RED_TARGET)
+        SendMaterialRequest("000000000000000000000001", "RED", RED_OUTPUT, RED_TARGET)
     elif partColor == "BLUE":
-        SendMaterialRequest("BLUE", BLUE_OUTPUT, BLUE_TARGET)
+        SendMaterialRequest("000000000000000000000002", "BLUE", BLUE_OUTPUT, BLUE_TARGET)
     elif partColor == "WHITE":
-        SendMaterialRequest("WHITE", WHITE_OUTPUT, WHITE_TARGET)
+        SendMaterialRequest("000000000000000000000003", "WHITE", WHITE_OUTPUT, WHITE_TARGET)
     else:
         print("Undefined")
 
@@ -30,14 +23,21 @@ def PartFailed():
     print("Failed part")
 
 
-def SendMaterialRequest(materialType: str, sourceWhUnit: str, targetWhUnit: str):
+def SendMaterialRequest(muUid: str, materialType: str, sourceWhUnit: str, targetWhUnit: str):
+
+
     payload = {
+        "muConfig": json.dumps({
+            "created": True
+        }),
         "data": json.dumps({
             "name": "From MQTT",
+            "what": muUid,
             "what_material": materialType,
             "from": sourceWhUnit,
             "to": targetWhUnit,
-            "pickupMode": 1,
+            "pickupMode": 0,
+            "deadline": int(time.time() * 1000) + 1000 * 60 * 5,
         })
     }
 

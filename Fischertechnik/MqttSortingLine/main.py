@@ -567,21 +567,24 @@ class MQTTLoggerApp:
                         return val.lower() == "true"
                     return False
 
-                # Check each pass color
+                # Check each pass color — both "active" AND "on" must be true
                 detected_color = None
                 for color in PASS_COLORS:
-                    if color in inner_payload and is_active(inner_payload[color].get("active")):
-                        detected_color = color.upper()
-                        break
+                    if color in inner_payload:
+                        color_data = inner_payload[color]
+                        if is_active(color_data.get("active")) and is_active(color_data.get("on")):
+                            detected_color = color.upper()
+                            break
 
                 # Check fail state
                 fail_data = inner_payload.get("fail", {})
                 is_fail = is_active(fail_data.get("active")) or is_active(fail_data.get("on"))
 
                 if detected_color:
+                    print(inner_payload)
                     PartPassed(detected_color)
                 elif is_fail:
-                    PartFailed()  # call whatever your fail handler is
+                    PartFailed()
 
         except Exception:
             # If it's not JSON or parsing fails, just ignore and continue logging
